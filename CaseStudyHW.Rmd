@@ -312,6 +312,8 @@ allData %>%
   select(-geometry) %>% 
   DT::datatable()
 ```
+**NAPOMENA:** Većina kodova se poklapa, ali bi trebalo uraditi detaljnu analizu i povezati sve kodove. Takođe, u podacima sa olimpijskih igara postoje zemlje koje više ne postoje (npr. **YUG**oslavia), pa bi i to trebalo srediti (možda jednog dana :-))
+
 
 Prikažimo broj poena na mapi:
 ```{r}
