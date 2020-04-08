@@ -289,7 +289,6 @@ U tu svrhu ćemo koristiti pakete `rnaturalearth` i `rnaturalearthdata`
 ```{r}
 library("rnaturalearth")
 library("rnaturalearthdata")
-
 ```
 
 Iz ovih paketa ćemo kreirati data frame `world`:
