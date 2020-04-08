@@ -1,0 +1,336 @@
+---
+title: "CaseStudyHW"
+author: "Milan Đuretanović"
+date: '07.04.2020'
+output: 
+  html_document:
+    theme: "flatly"
+    toc: true
+    toc_float: true
+    code_download: true
+    df_print: kable
+params:
+  data: "data/athlete_events.csv"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r include=FALSE}
+library(here) # for file paths
+library(tidyverse) # for all else
+theme_set(theme_minimal())
+```
+## Uvod
+
+Ovo je domaći zadatak nakon dvodnevnog **DS boot camp**-a.<br>
+Koristićemo podatke o svim učesnicima na olimpijadama.<br>
+Podaci se nalaze na linku: [https://github.com/TanjaKec/RMarkdown4RR](https://github.com/TanjaKec/RMarkdown4RR)
+
+
+## Task #1. Struktura podataka
+
+Učitajmo podatke iz csv fajla
+```{r}
+athlete_events <- read.csv(here(params$data),encoding = "UTF-8")
+```
+Pogledajmo strukturu podataka koristeći funkciju `glimpse()`.
+```{r}
+glimpse(athlete_events)
+```
+
+## Task #2. Filtriranje varijabli
+
+U ovom primeru ćemo selektovati sve varijable koje se završavaju na slovo **`t`**, a počinju slovom **`s`**.
+Napravićemo data frame **myData** koji zadovoljava traženi uslov:  
+
+```{r}
+myData <- select(athlete_events, ends_with("t"))%>%
+          select(,starts_with("S"))
+head(myData, n = 3)
+```
+Dakle, prvo smo korišćenjem funkcije `select()` izdvojili sve varijable koje se završavaju slovom **`t`** (`ends_with`).
+
+Zatim smo rezultat te operacije prosledili drugoj `select()` funkciji u kojoj smo sada izdvojili one varijable koje počinju slovom **`S`** (`starts_with`).
+
+Ovaj rezultat smo upisali u data frame `myData`.
+
+Na kraju smo korišćenjem funkcije `head()` prikazali prva tri reda našeg data frame-a.
+
+## Task #3. Kreiranje novih varijabli
+
+Potrebno je da kreiramo varijablu ***Body Mass Index (BMI)*** ($kg/m^2$) koja se računa po sledećoj formuli:
+$$BMI=Weight/(Height/100)^2$$
+Za ovu operaciju koristi se funkcija `mutate()`.
+
+Našem data frame-u `athlete_events` dodaćemo varijablu BMI:
+```{r}
+athlete_events <- mutate(athlete_events,BMI=Weight/(Height/100)^2)
+head(athlete_events,5)
+```
+
+## Task #4. Filtriranje podataka
+
+U ovom zadatku ćemo napraviti dva nova data frame-a, koje ćemo dobiti filtriranjem podataka iz data frame-a `athlete_events`, korišćenjem funkcije `filter()`.
+
+Prvi data frame `olympicSR` treba da sadrži podatke o svim učesnicima iz Srbije:
+```{r}
+olympicSR <- filter(athlete_events,Team=="Serbia")
+head(olympicSR,5)
+```
+
+Drugi data frame `olympicSR21c` treba da sadrži podatke o svim učesnicima iz Srbije koji su učestvovali na olimpijadama počev od 2000. godine i koji imaju preko 100Kg težine i preko 2m visine: 
+```{r}
+olympicSR21c <- filter(olympicSR,Year>=2000 & Weight>100 & Height>200)
+head(olympicSR21c,5)
+```
+
+## Task #5. Sortiranje podataka
+Za sortiranje podataka u data frame-u koristi se funkcija `arrange()`.
+
+Sortirajmo podatke u data frame-u `olympicSR21c` po **rastućoj** vrednosti varijable `Height`:
+```{r}
+olympicSR21c <- arrange(olympicSR21c,Height)
+head(olympicSR21c,5)
+```
+
+Sortirajmo sada podatke u data frame-u `olympicSR21c` po **opadajućoj** vrednosti varijable `Height`:
+```{r}
+olympicSR21c <- arrange(olympicSR21c,desc(Height))
+head(olympicSR21c,5)
+```
+
+## Task #6. Još malo sortiranja
+
+Iskoristimo sortiranje kako bismo pronašli najmlađeg i najstarijeg sportistu u data frame-u `olympicSR`.
+
+Kako bismo pronašli najmlađeg sportistu, sortiraćemo date frame u rastućem redosledu po varijabli `Age` i prikazati samo prvi red:
+```{r}
+olympicSR <- arrange(olympicSR,Age)
+head(olympicSR,1)
+```
+
+slično, da bismo pronašli najstarijeg sportistu, sortiraćemo date frame u opadajućem redosledu po varijabli `Age` i prikazati samo prvi red:
+```{r}
+olympicSR <- arrange(olympicSR,desc(Age))
+head(olympicSR,1)
+```
+
+## Task #7. Sumiranje podataka
+
+Za sumiranje podataka u data frame-u koriste se sledeće funkcije:
+<style>
+#functions {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#functions td, #customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#functions tr:nth-child(even){background-color: #f2f2f2;}
+
+#functions tr:hover {background-color: #ddd;}
+
+#functions th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #0000ff;
+  color: white;
+}
+</style>
+<table id="functions">
+	<thead>
+		<tr>
+			<th>Objective</th>
+			<th>Function</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>basic</td>
+			<td>
+				<code>sum(x)</code>
+			</td>
+			<td>Sum of vector x</td>
+		</tr>
+		<tr>
+			<td>centre</td>
+			<td>
+				<code>mean(x)</code>
+			</td>
+			<td>Mean (average) of vector x</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>
+				<code>median(x)</code>
+			</td>
+			<td>Median of vector x</td>
+		</tr>
+		<tr>
+			<td>spread</td>
+			<td>
+				<code>sd(x)</code>
+			</td>
+			<td>Standard deviation of vector x</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>
+				<code>quantile(x, probs)</code>
+			</td>
+			<td>Quantile of vector x</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>
+				<code>range(x)</code>
+			</td>
+			<td>Range of vector x</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>
+				<code>diff(range(x)))</code>
+			</td>
+			<td>Width of the range of vector x</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>
+				<code>min(x)</code>
+			</td>
+			<td>Min of vector x</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>
+				<code>max(x)</code>
+			</td>
+			<td>Max of vector x</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>
+				<code>abs(x)</code>
+			</td>
+			<td>Absolute value of a number x</td>
+		</tr>
+	</tbody>
+</table>
+
+
+
+U našem primeru ćemo sumirati podatke data frame-a `olympicSR`.
+
+Prvo ćemo pronaći dve sumarne varijable: **max_Age** i **max_BMI**:
+```{r}
+summarise(olympicSR,max_Age=max(Age),max_BMI=max(BMI))
+```
+
+Sada pronađimo **mean_Age** i **mean_BMI**:
+```{r}
+summarise(olympicSR,mean_Age=mean(Age),mean_BMI=mean(BMI))
+```
+
+## Task #8. Vizuelizacija podataka
+
+Prikažimo tabelarno broj osvojenih medalja na svim olimpijskim igrama po timovima:
+```{r}
+athlete_events %>% 
+  filter(!is.na(Medal)) %>% 
+  group_by(NOC, Medal) %>% 
+  summarize(cases=n()) %>% 
+  DT::datatable()
+```
+
+Napravimo novi data frame `Countries` koji će u jednom redu prikazati sledeće podatke:
+Team, NOC, Year, Athletes, Gold, Silver, Bronze
+
+```{r}
+countries <- athlete_events %>% 
+  mutate(Medal=forcats::fct_explicit_na(Medal,na_level = "NoMedal")) %>% 
+  group_by(Team, NOC, Year, Medal) %>% 
+  summarize(Cases=n()) %>% 
+  spread(,key = "Medal", value = "Cases") %>% 
+  mutate(Athletes=sum(Gold,Silver,Bronze,NoMedal,na.rm = TRUE))
+countries %>% 
+  DT::datatable()
+```
+
+Pokušajmo da prikažemo zemlje učesnice svih olimpijada sortirane po broju bodova koje dobijamo sledećom formulom:
+$$Points=3*Gold + 2*Silver + Bronze$$
+
+```{r}
+countries <- mutate(countries,Points=sum(3*Gold,2*Silver,Bronze,na.rm = TRUE)) %>% 
+  group_by(NOC) %>% 
+  summarize(
+      Athletes=sum(Athletes,na.rm = TRUE), 
+      Gold=sum(Gold,na.rm = TRUE),
+      Silver=sum(Silver,na.rm = TRUE),
+      Bronze=sum(Bronze,na.rm = TRUE),
+      Points=sum(Points,na.rm = TRUE)
+  )
+arrange(countries,desc(Points)) %>% 
+  DT::datatable()
+```
+
+Sada ćemo na mapi sveta prikazati broj poena po zemljama.
+
+U tu svrhu ćemo koristiti pakete `rnaturalearth` i `rnaturalearthdata`
+
+```{r}
+library("rnaturalearth")
+library("rnaturalearthdata")
+```
+
+Iz ovih paketa ćemo kreirati data frame `world`:
+
+```{r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+class(world)
+```
+
+Pogledajmo šta sadrži ovaj data frame:
+```{r}
+glimpse(world)
+```
+
+Možemo videti da se naš prethodni data frame `countries` može povezati sa data frame-om `world` preko polja NOC i iso_a3, pa ćemo povezati ove data frame-ove:
+
+```{r}
+allData <- merge(world,countries,by.x="iso_a3",by.y="NOC",all.x = TRUE)
+allData %>% 
+  select(-geometry) %>% 
+  DT::datatable()
+```
+
+Prikažimo broj poena na mapi:
+```{r}
+ggplot(data = allData) +
+    geom_sf(aes(fill = Points)) +
+    scale_fill_viridis_c(option = "plasma", trans = "sqrt")
+```
+
+Kako u našem data frame-u imamo i broj stanovnika u zemlji, izračunajmo i prosečan broj poena na 1000 stanovnika. 
+```{r}
+allData <- mutate(allData,PointsPer1000Capita=Points/pop_est*1000) 
+
+allData %>% 
+  select(-geometry) %>% 
+  DT::datatable()
+```
+
+Na kraju, prikažimo i to na mapi:
+```{r}
+ggplot(data = allData) +
+    geom_sf(aes(fill = PointsPer1000Capita)) +
+    scale_fill_viridis_c(option = "plasma", trans = "sqrt")
+```
